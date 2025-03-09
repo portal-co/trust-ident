@@ -1,0 +1,8 @@
+[package]
+name = "trust-ident"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nom = {version="7.1.3",default-features = false,features=["alloc"]}
+quickcheck = "1.0.3"
