@@ -1,6 +1,7 @@
 #![no_std]
-use core::{borrow::Borrow, marker::PhantomData, ops::Deref};
+use core::{borrow::Borrow, cmp::Ordering, fmt::{Debug, Display, Formatter}, marker::PhantomData, ops::Deref};
 
+use duplicate::duplicate_item;
 use nom::{
     character::complete::digit1,
     combinator::{map_res, recognize},
@@ -38,6 +39,11 @@ impl Cfg for CCfg {
 
 #[repr(transparent)]
 pub struct Ident<C: Cfg>(String, PhantomData<fn(&C) -> &C>);
+impl<C: Cfg> Clone for Ident<C>{
+    fn clone(&self) -> Self {
+        Self(self.0.clone(), self.1.clone())
+    }
+}
 #[repr(transparent)]
 pub struct IdentRef<C: Cfg>(PhantomData<fn(&C) -> &C>, str);
 impl<C: Cfg> Deref for Ident<C> {
@@ -54,7 +60,46 @@ impl<C: Cfg> Deref for IdentRef<C> {
         &self.1
     }
 }
+#[duplicate_item(
+    typ;
+    [Ident];
+    [IdentRef];
+)]
+const _: () = {
+    impl<C: Cfg> PartialEq for typ<C>{
+        fn eq(&self, other: &Self) -> bool{
+            return self.as_str() == other.as_str();
+        }
+    }
+    impl<C: Cfg> Eq for typ<C>{
+
+    }
+    impl<C: Cfg> PartialOrd for typ<C>{
+        fn partial_cmp(&self, other: &Self) -> Option<Ordering>{
+            self.as_str().partial_cmp(other.as_str())
+        }
+    }
+    impl<C: Cfg> Ord for typ<C>{
+        fn cmp(&self, other: &Self) -> Ordering{
+            self.as_str().cmp(other.as_str())
+        }
+    }
+    impl<C: Cfg> Debug for typ<C>{
+        fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error>{
+            <str as Debug>::fmt(self.as_str(),f)
+        }   
+    }
+    impl<C: Cfg> Display for typ<C>{
+        fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error>{
+            <str as Display>::fmt(self.as_str(),f)
+        }   
+    }
+};
+
 impl<C: Cfg> IdentRef<C> {
+    pub fn as_str<'a>(&'a self) -> &'a str{
+        self
+    }
     pub fn parse<'a>(a: &'a str) -> Option<&'a Self> {
         if a.chars().all(|k| C::valid(k)) {
             Some(unsafe { core::mem::transmute(a) })
