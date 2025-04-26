@@ -5,7 +5,7 @@ use duplicate::duplicate_item;
 use nom::{
     character::complete::digit1,
     combinator::{map_res, recognize},
-    IResult,
+    IResult, Parser,
 };
 #[macro_use]
 extern crate alloc;
@@ -15,10 +15,10 @@ use alloc::{
     string::String,
 };
 fn my_usize(input: &str) -> IResult<&str, usize> {
-    map_res(recognize(digit1), str::parse)(input)
+    map_res(recognize(digit1), str::parse).parse(input)
 }
 fn my_u32(input: &str) -> IResult<&str, u32> {
-    map_res(recognize(digit1), str::parse)(input)
+    map_res(recognize(digit1), str::parse).parse(input)
 }
 
 pub trait Cfg {
