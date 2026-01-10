@@ -1,13 +1,14 @@
 # trust-ident
 
 ## Description
-Project trust-ident
+"Mangler for identifiers". A utility crate (`trust-ident`) for renaming or obfuscating identifiers.
 
 ## Goals
-- [ ] Add project goals
+- [ ] Mangle identifiers
+- [ ] Ensure valid output names
 
 ## Progress
-- [ ] Initial setup
+- [ ] Crate initialized
 
 ---
 *AI assisted*
